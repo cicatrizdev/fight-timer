@@ -87,11 +87,11 @@ export const MODALITY_PRESETS: ModalityPreset[] = [
   preset('mma', 5, 300, 60),
   preset('muaythai', 5, 180, 120),
   preset('bjj', 6, 300, 60, {
-    // Mat kit: referee whistle instead of the ring bell.
+    // Mat kit: referee whistle starts the round; the rest follows the
+    // standard bell kit.
     sounds: {
       ...DEFAULT_CUE_SOUNDS,
       roundStart: { id: 'whistle', volume: 1 },
-      roundEnd: { id: 'whistle', volume: 1 },
       roundWarn: { id: 'beep', volume: 0.9 },
     },
   }),
