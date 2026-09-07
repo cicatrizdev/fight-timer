@@ -46,6 +46,12 @@ export function TimerScreen() {
               {t('timer.back')}
             </button>
           </div>
+          <p className="timer__credit">
+            {t('app.madeBy')}{' '}
+            <a href="https://cicatriz.dev" target="_blank" rel="noreferrer">
+              Cicatriz
+            </a>
+          </p>
         </div>
       </div>
     )

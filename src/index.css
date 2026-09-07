@@ -713,6 +713,23 @@ button {
   align-items: center;
 }
 
+.timer__credit {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  animation: finish-rise 0.45s ease-out 0.5s both;
+}
+
+.timer__credit a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.timer__credit a:hover {
+  text-decoration: underline;
+}
+
 @media (orientation: landscape) and (max-height: 500px) {
   .timer {
     padding-top: calc(env(safe-area-inset-top) + 0.25rem);
