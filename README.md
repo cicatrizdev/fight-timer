@@ -46,3 +46,8 @@ npm run preview  # serve o build (necessário para testar o PWA/offline)
 O motor do timer (`src/core/timer/`) é uma máquina de estados pura baseada em
 timestamps absolutos — imune a throttling de aba em segundo plano — com ticks
 vindos de um Web Worker e ressincronização em `visibilitychange`.
+
+---
+
+Feito com 🥊 por [Pedro "Cicatriz" Mello](https://cicatriz.dev) · no ar em
+[timer.cicatriz.dev](https://timer.cicatriz.dev)

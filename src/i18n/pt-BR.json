@@ -2,7 +2,8 @@
   "app": {
     "name": "Fight Timer",
     "install": "Instalar app",
-    "iosInstallHint": "No iPhone/iPad: toque em Compartilhar e depois em \"Adicionar à Tela de Início\"."
+    "iosInstallHint": "No iPhone/iPad: toque em Compartilhar e depois em \"Adicionar à Tela de Início\".",
+    "madeBy": "Feito com 🥊 por"
   },
   "settings": {
     "timing": "Tempos",

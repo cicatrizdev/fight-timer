@@ -2,7 +2,8 @@
   "app": {
     "name": "Fight Timer",
     "install": "Install app",
-    "iosInstallHint": "On iPhone/iPad: tap Share, then \"Add to Home Screen\"."
+    "iosInstallHint": "On iPhone/iPad: tap Share, then \"Add to Home Screen\".",
+    "madeBy": "Made with 🥊 by"
   },
   "settings": {
     "timing": "Timing",

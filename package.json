@@ -2,6 +2,7 @@
   "name": "fight-timer",
   "private": true,
   "version": "0.0.0",
+  "author": "Pedro \"Cicatriz\" Mello <contato@cicatriz.dev> (https://cicatriz.dev)",
   "type": "module",
   "scripts": {
     "dev": "vite",

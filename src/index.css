@@ -414,6 +414,25 @@ button {
   margin: 0;
 }
 
+.settings__footer {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding-top: 0.5rem;
+}
+
+.settings__footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.settings__footer a:hover {
+  text-decoration: underline;
+}
+
 .settings__start-bar {
   position: fixed;
   left: 0;

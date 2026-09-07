@@ -159,6 +159,19 @@ export function SettingsScreen() {
 
       {showIOSHint && <p className="settings__ios-hint">{t('app.iosInstallHint')}</p>}
 
+      <footer className="settings__footer">
+        <span>
+          {t('app.madeBy')}{' '}
+          <a href="https://cicatriz.dev" target="_blank" rel="noreferrer">
+            Cicatriz
+          </a>
+        </span>
+        <span aria-hidden="true">·</span>
+        <a href="https://github.com/cicatrizdev/fight-timer" target="_blank" rel="noreferrer">
+          GitHub
+        </a>
+      </footer>
+
       <div className="settings__start-bar">
         <p className="settings__summary">
           {totalRounds} rounds · {t('settings.totalTime', { total: formatSeconds(totalSec) })}
