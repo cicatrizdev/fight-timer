@@ -59,8 +59,22 @@ export function SettingsScreen() {
   return (
     <div className="settings">
       <header className="settings__header">
-        <h1 className="settings__title">
-          🥊 {t('app.name')}
+        <h1 className="logo" aria-label={t('app.name')}>
+          <svg className="logo__mark" viewBox="0 0 64 64" aria-hidden="true">
+            <g fill="#e63946" transform="translate(-4 0)">
+              <rect x="12" y="8" width="38" height="34" rx="17" />
+              <circle cx="14" cy="32" r="9" />
+              <rect x="25" y="46" width="22" height="10" rx="4" />
+            </g>
+            <g fill="var(--accent)">
+              <rect x="52" y="13" width="8" height="4" rx="2" />
+              <rect x="54" y="23" width="8" height="4" rx="2" />
+              <rect x="52" y="33" width="8" height="4" rx="2" />
+            </g>
+          </svg>
+          <span className="logo__word">
+            FIGHT<em>TIMER</em>
+          </span>
         </h1>
         {canInstall && (
           <button type="button" className="btn btn--ghost" onClick={() => void promptInstall()}>
