@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { audioManager } from '../../core/audio/AudioManager'
 import { formatSeconds } from '../../lib/format'
-import { useInstallPrompt } from '../../lib/useInstallPrompt'
+import { isIOS, useInstallPrompt } from '../../lib/useInstallPrompt'
 import { listUserSounds, type UserSound } from '../../lib/userSounds'
 import { totalWorkoutSec } from '../../core/timer/engine'
 import { MODALITY_PRESETS, useConfigStore, type CueId, type TimingConfig } from '../../stores/configStore'
@@ -172,6 +172,16 @@ export function SettingsScreen() {
         <Toggle label={t('settings.tts')} checked={config.tts} onChange={(v) => config.set({ tts: v })} />
         {config.tts && <VoicePicker />}
         <Toggle label={t('settings.vibrate')} checked={config.vibrate} onChange={(v) => config.set({ vibrate: v })} />
+        {isIOS() && (
+          <>
+            <Toggle
+              label={t('settings.silentSwitch')}
+              checked={config.ignoreSilentSwitch}
+              onChange={(v) => config.set({ ignoreSilentSwitch: v })}
+            />
+            <p className="settings__hint">{t('settings.silentSwitchHint')}</p>
+          </>
+        )}
       </section>
 
       {showIOSHint && <p className="settings__ios-hint">{t('app.iosInstallHint')}</p>}

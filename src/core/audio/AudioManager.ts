@@ -1,16 +1,17 @@
 import { NO_SOUND, PRESET_SOUNDS } from './sounds'
 import { listUserSounds } from '../../lib/userSounds'
 
-// W3C Audio Session API (Safari/WebKit): "transient" makes our short cues mix
-// with background music instead of pausing it. Trade-off on iOS: mixed audio
-// respects the ring/silent switch. Browsers without the API keep the default.
+// W3C Audio Session API (Safari/WebKit). iOS forces a choice the user makes
+// in the settings: "transient" mixes cues with background music but obeys the
+// ring/silent switch; "playback" sounds even on silent but may pause music.
+// Browsers without the API keep the platform default (Android mixes anyway).
 type AudioSessionLike = { type: string }
 
-function requestMixedAudioSession(): void {
+export function applyAudioSessionType(ignoreSilentSwitch: boolean): void {
   const session = (navigator as Navigator & { audioSession?: AudioSessionLike }).audioSession
   if (!session) return
   try {
-    session.type = 'transient'
+    session.type = ignoreSilentSwitch ? 'playback' : 'transient'
   } catch {
     // Unknown value or read-only — keep the platform default.
   }
@@ -27,10 +28,7 @@ class AudioManager {
   private loading: Promise<void> | null = null
 
   private ensureCtx(): AudioContext {
-    if (!this.ctx) {
-      requestMixedAudioSession()
-      this.ctx = new AudioContext()
-    }
+    this.ctx ??= new AudioContext()
     return this.ctx
   }
 

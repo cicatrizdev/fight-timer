@@ -104,6 +104,8 @@ export interface ConfigState extends TimingConfig {
   /** Specific speechSynthesis voice name; null = automatic best match. */
   ttsVoice: string | null
   vibrate: boolean
+  /** iOS: play cues even with the ring/silent switch on (may pause music). */
+  ignoreSilentSwitch: boolean
   sounds: CueSounds
   userPresets: UserPreset[]
   set: (patch: Partial<ConfigState>) => void
@@ -150,6 +152,7 @@ export const useConfigStore = create<ConfigState>()(
       tts: false,
       ttsVoice: null,
       vibrate: true,
+      ignoreSilentSwitch: false,
       sounds: DEFAULT_CUE_SOUNDS,
       userPresets: [],
       set: (patch) => set(patch),

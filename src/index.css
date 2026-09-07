@@ -447,6 +447,13 @@ button {
   font-size: 1rem;
 }
 
+.settings__hint {
+  margin: -0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
 .settings__ios-hint {
   color: var(--muted);
   font-size: 0.85rem;

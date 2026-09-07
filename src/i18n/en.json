@@ -61,6 +61,8 @@
     "ttsVoice": "Voice",
     "ttsVoiceAuto": "Automatic (best available)",
     "vibrate": "Vibration",
+    "silentSwitch": "Sound in silent mode",
+    "silentSwitchHint": "On: cues play even with the iPhone muted, but may pause your music. Off: they mix with music, but the silent switch is respected. iOS doesn't allow both at once.",
     "uploadSound": "Add my sound",
     "uploadTooBig": "File too large (max 1 MB).",
     "uploadInvalid": "Couldn't read that audio file.",

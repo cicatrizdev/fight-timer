@@ -61,6 +61,8 @@
     "ttsVoice": "Voz",
     "ttsVoiceAuto": "Automática (melhor disponível)",
     "vibrate": "Vibração",
+    "silentSwitch": "Som no modo silencioso",
+    "silentSwitchHint": "Ligado: os avisos tocam mesmo com o iPhone no silencioso, mas podem pausar sua música. Desligado: misturam com a música, mas o botão de silencioso é respeitado. O iOS não permite os dois ao mesmo tempo.",
     "uploadSound": "Adicionar meu som",
     "uploadTooBig": "Arquivo muito grande (máx. 1 MB).",
     "uploadInvalid": "Não consegui ler esse arquivo de áudio.",
