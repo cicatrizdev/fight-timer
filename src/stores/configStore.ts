@@ -43,6 +43,8 @@ export interface UserPreset extends TimingConfig {
 export interface ModalityPreset extends TimingConfig {
   id: string
   nameKey: string
+  /** Cue sounds this modality ships with; applied together with the timing. */
+  sounds?: Partial<CueSounds>
 }
 
 export function makeBlock(patch: Partial<BlockConfig> = {}): BlockConfig {
@@ -58,24 +60,6 @@ export function makeBlock(patch: Partial<BlockConfig> = {}): BlockConfig {
   }
 }
 
-const preset = (id: string, rounds: number, roundSec: number, restSec: number, extra: Partial<ModalityPreset> = {}): ModalityPreset => ({
-  id,
-  nameKey: id,
-  warmupSec: 60,
-  roundWarnSec: 10,
-  restWarnSec: 0,
-  blocks: [makeBlock({ rounds, roundSec, restSec })],
-  ...extra,
-})
-
-export const MODALITY_PRESETS: ModalityPreset[] = [
-  preset('boxing', 12, 180, 60),
-  preset('mma', 5, 300, 60),
-  preset('muaythai', 5, 180, 120),
-  preset('bjj', 6, 300, 60),
-  preset('hiit', 8, 40, 20, { warmupSec: 30, roundWarnSec: 5 }),
-]
-
 export const DEFAULT_CUE_SOUNDS: CueSounds = {
   roundStart: { id: 'bell', volume: 1 },
   roundEnd: { id: 'bell', volume: 1 },
@@ -85,6 +69,34 @@ export const DEFAULT_CUE_SOUNDS: CueSounds = {
   countdown: { id: 'beep', volume: 0.7 },
   interval: { id: 'beep', volume: 0.9 },
 }
+
+const preset = (id: string, rounds: number, roundSec: number, restSec: number, extra: Partial<ModalityPreset> = {}): ModalityPreset => ({
+  id,
+  nameKey: id,
+  warmupSec: 60,
+  roundWarnSec: 10,
+  restWarnSec: 0,
+  blocks: [makeBlock({ rounds, roundSec, restSec })],
+  // Ring sports ship with the bell kit; presets with their own kit override.
+  sounds: DEFAULT_CUE_SOUNDS,
+  ...extra,
+})
+
+export const MODALITY_PRESETS: ModalityPreset[] = [
+  preset('boxing', 12, 180, 60),
+  preset('mma', 5, 300, 60),
+  preset('muaythai', 5, 180, 120),
+  preset('bjj', 6, 300, 60, {
+    // Mat kit: referee whistle instead of the ring bell.
+    sounds: {
+      ...DEFAULT_CUE_SOUNDS,
+      roundStart: { id: 'whistle', volume: 1 },
+      roundEnd: { id: 'whistle', volume: 1 },
+      roundWarn: { id: 'beep', volume: 0.9 },
+    },
+  }),
+  preset('hiit', 8, 40, 20, { warmupSec: 30, roundWarnSec: 5 }),
+]
 
 export interface ConfigState extends TimingConfig {
   countdownBeeps: boolean
@@ -99,7 +111,7 @@ export interface ConfigState extends TimingConfig {
   updateBlock: (id: string, patch: Partial<BlockConfig>) => void
   addBlock: () => void
   removeBlock: (id: string) => void
-  applyTiming: (timing: TimingConfig) => void
+  applyTiming: (timing: TimingConfig & { sounds?: Partial<CueSounds> }) => void
   saveUserPreset: (name: string) => void
   deleteUserPreset: (id: string) => void
 }
@@ -148,7 +160,11 @@ export const useConfigStore = create<ConfigState>()(
       addBlock: () => set((s) => ({ blocks: [...s.blocks, makeBlock()] })),
       removeBlock: (id) =>
         set((s) => (s.blocks.length > 1 ? { blocks: s.blocks.filter((b) => b.id !== id) } : s)),
-      applyTiming: (timing) => set(copyTiming(timing)),
+      applyTiming: (timing) =>
+        set((s) => ({
+          ...copyTiming(timing),
+          ...(timing.sounds ? { sounds: { ...s.sounds, ...timing.sounds } } : {}),
+        })),
       saveUserPreset: (name) =>
         set((s) => ({
           userPresets: [...s.userPresets, { id: crypto.randomUUID(), name, ...copyTiming(get()) }],
