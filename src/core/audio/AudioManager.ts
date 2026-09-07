@@ -1,6 +1,21 @@
 import { NO_SOUND, PRESET_SOUNDS } from './sounds'
 import { listUserSounds } from '../../lib/userSounds'
 
+// W3C Audio Session API (Safari/WebKit): "transient" makes our short cues mix
+// with background music instead of pausing it. Trade-off on iOS: mixed audio
+// respects the ring/silent switch. Browsers without the API keep the default.
+type AudioSessionLike = { type: string }
+
+function requestMixedAudioSession(): void {
+  const session = (navigator as Navigator & { audioSession?: AudioSessionLike }).audioSession
+  if (!session) return
+  try {
+    session.type = 'transient'
+  } catch {
+    // Unknown value or read-only — keep the platform default.
+  }
+}
+
 /**
  * Plays cue sounds through the Web Audio API. Buffers are pre-decoded so cues
  * fire with near-zero latency, and (unlike <audio>) they keep playing on iOS
@@ -11,20 +26,28 @@ class AudioManager {
   private buffers = new Map<string, AudioBuffer>()
   private loading: Promise<void> | null = null
 
+  private ensureCtx(): AudioContext {
+    if (!this.ctx) {
+      requestMixedAudioSession()
+      this.ctx = new AudioContext()
+    }
+    return this.ctx
+  }
+
   /** Must be called from a user gesture (the start button) before any cue. */
   async unlock(): Promise<void> {
-    this.ctx ??= new AudioContext()
-    if (this.ctx.state === 'suspended') {
+    const ctx = this.ensureCtx()
+    if (ctx.state === 'suspended') {
       try {
-        await this.ctx.resume()
+        await ctx.resume()
       } catch {
         // Will retry on the next gesture.
       }
     }
     // Silent tick fully unlocks playback on iOS.
-    const src = this.ctx.createBufferSource()
-    src.buffer = this.ctx.createBuffer(1, 1, this.ctx.sampleRate)
-    src.connect(this.ctx.destination)
+    const src = ctx.createBufferSource()
+    src.buffer = ctx.createBuffer(1, 1, ctx.sampleRate)
+    src.connect(ctx.destination)
     src.start()
     await this.preloadAll()
   }
@@ -57,16 +80,14 @@ class AudioManager {
 
   /** Decode and register a buffer; used by preload and right after an upload. */
   async decodeInto(id: string, data: ArrayBuffer): Promise<void> {
-    this.ctx ??= new AudioContext()
-    const buffer = await this.ctx.decodeAudioData(data)
+    const buffer = await this.ensureCtx().decodeAudioData(data)
     this.buffers.set(id, buffer)
   }
 
   /** Validates that a file is decodable audio without registering it. */
   async canDecode(data: ArrayBuffer): Promise<boolean> {
-    this.ctx ??= new AudioContext()
     try {
-      await this.ctx.decodeAudioData(data)
+      await this.ensureCtx().decodeAudioData(data)
       return true
     } catch {
       return false
