@@ -3,7 +3,8 @@
     "name": "Fight Timer",
     "install": "Install app",
     "iosInstallHint": "On iPhone/iPad: tap Share, then \"Add to Home Screen\".",
-    "madeBy": "Made with 🥊 by"
+    "madeBy": "Made with 🥊 by",
+    "tagline": "Train like a fighter."
   },
   "settings": {
     "timing": "Timing",

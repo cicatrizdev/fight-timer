@@ -72,8 +72,11 @@ export function SettingsScreen() {
               <rect x="52" y="33" width="8" height="4" rx="2" />
             </g>
           </svg>
-          <span className="logo__word">
-            FIGHT<em>TIMER</em>
+          <span className="logo__text">
+            <span className="logo__word">
+              FIGHT<em>TIMER</em>
+            </span>
+            <span className="logo__tagline">{t('app.tagline')}</span>
           </span>
         </h1>
         {canInstall && (

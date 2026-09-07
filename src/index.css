@@ -104,6 +104,22 @@ button {
   filter: drop-shadow(0 2px 8px rgba(230, 57, 70, 0.35));
 }
 
+.logo__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.logo__tagline {
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transform: skewX(-4deg);
+}
+
 .logo__word {
   font-size: 1.65rem;
   font-weight: 900;
