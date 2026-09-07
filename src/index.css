@@ -694,22 +694,6 @@ button {
   align-items: center;
 }
 
-/* ---------- wide screens ---------- */
-
-@media (min-width: 860px) {
-  .settings {
-    max-width: 1000px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-  }
-
-  .settings__header,
-  .settings__ios-hint {
-    grid-column: 1 / -1;
-  }
-}
-
 @media (orientation: landscape) and (max-height: 500px) {
   .timer {
     padding-top: calc(env(safe-area-inset-top) + 0.25rem);
