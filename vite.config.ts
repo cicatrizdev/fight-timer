@@ -16,7 +16,7 @@ export default defineConfig({
       manifest: {
         name: 'Fight Timer',
         short_name: 'Fight Timer',
-        description: 'Round timer for boxing, MMA and muay thai training',
+        description: 'Round timer for any combat sport — boxing, MMA, muay thai, jiu-jitsu and more',
         lang: 'pt-BR',
         display: 'standalone',
         orientation: 'any',

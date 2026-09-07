@@ -72,6 +72,7 @@ export const MODALITY_PRESETS: ModalityPreset[] = [
   preset('boxing', 12, 180, 60),
   preset('mma', 5, 300, 60),
   preset('muaythai', 5, 180, 120),
+  preset('bjj', 6, 300, 60),
   preset('hiit', 8, 40, 20, { warmupSec: 30, roundWarnSec: 5 }),
 ]
 

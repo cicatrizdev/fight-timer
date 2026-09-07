@@ -1,8 +1,8 @@
 # 🥊 Fight Timer
 
-Timer de rounds para treino de lutas (boxe, MMA, muay thai, HIIT) — web app
-**PWA instalável e 100% offline**, com experiência de app nativo em celular,
-tablet e desktop.
+Timer de rounds para **qualquer esporte de luta** — boxe, MMA, muay thai,
+jiu-jitsu, HIIT e o que mais você treinar. Web app **PWA instalável e 100%
+offline**, com experiência de app nativo em celular, tablet e desktop.
 
 ## Features
 
@@ -17,8 +17,8 @@ tablet e desktop.
 - Sons reais de luta (sino de boxe, clacker de madeira, air horn, buzzer — CC0,
   ver `public/sounds/CREDITS.md`) + upload de sons próprios (salvos no
   IndexedDB)
-- Presets de modalidade (Boxe 12×3', MMA 5×5', Muay Thai 5×3', HIIT) e presets
-  do usuário
+- Presets de modalidade (Boxe 12×3', MMA 5×5', Muay Thai 5×3', Jiu-Jitsu 6×5',
+  HIIT) e presets do usuário
 - Cor de tela por fase (verde = round, vermelho = descanso, âmbar =
   aquecimento) com pulso na janela de aviso — legível do outro lado do tatame
 - Wake Lock (tela não apaga durante o treino), avisos por voz (TTS),
