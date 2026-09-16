@@ -1,6 +1,8 @@
 import { NO_SOUND, PRESET_SOUNDS } from './sounds'
 import { listUserSounds } from '../../lib/userSounds'
 
+const BOOST_DRIVE = 5
+
 // W3C Audio Session API (Safari/WebKit). iOS forces a choice the user makes
 // in the settings: "transient" mixes cues with background music but obeys the
 // ring/silent switch; "playback" sounds even on silent but may pause music.
@@ -26,10 +28,77 @@ class AudioManager {
   private ctx: AudioContext | null = null
   private buffers = new Map<string, AudioBuffer>()
   private loading: Promise<void> | null = null
+  /** Every cue goes through this bus so the loud-music boost applies to all. */
+  private bus: GainNode | null = null
+  private boostChain: AudioNode[] = []
+  private boost = false
+  private keepAliveSrc: ConstantSourceNode | null = null
 
   private ensureCtx(): AudioContext {
-    this.ctx ??= new AudioContext()
+    if (!this.ctx) {
+      this.ctx = new AudioContext()
+      this.bus = this.ctx.createGain()
+      this.routeBus()
+    }
     return this.ctx
+  }
+
+  /**
+   * Boost = a tanh saturator: quiet parts get up to BOOST_DRIVE× gain while
+   * peaks round off below full scale. Output can't exceed the phone's max
+   * volume, so this raises perceived loudness by thickening the sound.
+   */
+  private routeBus(): void {
+    const ctx = this.ctx
+    if (!ctx || !this.bus) return
+    this.bus.disconnect()
+    for (const node of this.boostChain) node.disconnect()
+    this.boostChain = []
+    if (!this.boost) {
+      this.bus.connect(ctx.destination)
+      return
+    }
+    const shaper = ctx.createWaveShaper()
+    shaper.curve = saturationCurve(BOOST_DRIVE)
+    shaper.oversample = '4x'
+    this.bus.connect(shaper).connect(ctx.destination)
+    this.boostChain = [shaper]
+  }
+
+  setBoost(on: boolean): void {
+    if (on === this.boost) return
+    this.boost = on
+    this.routeBus()
+  }
+
+  /** True once the context is unlocked and actually rendering. */
+  get running(): boolean {
+    return this.ctx?.state === 'running'
+  }
+
+  /** Audio clock minus wall clock, in ms; jumps when the context was suspended. */
+  clockOffsetMs(wallNow: number): number {
+    return (this.ctx?.currentTime ?? 0) * 1000 - wallNow
+  }
+
+  /**
+   * An inaudible DC signal while a workout runs. Browsers treat a page that is
+   * producing audio as "playing media" and don't freeze or heavily throttle it
+   * in the background, so scheduled cues and ticks keep going.
+   */
+  setKeepAlive(on: boolean): void {
+    const ctx = this.ctx
+    if (on && !this.keepAliveSrc && ctx) {
+      const src = ctx.createConstantSource()
+      src.offset.value = 0.0001
+      src.connect(ctx.destination)
+      src.start()
+      this.keepAliveSrc = src
+    } else if (!on && this.keepAliveSrc) {
+      this.keepAliveSrc.stop()
+      this.keepAliveSrc.disconnect()
+      this.keepAliveSrc = null
+    }
   }
 
   /** Must be called from a user gesture (the start button) before any cue. */
@@ -96,18 +165,42 @@ class AudioManager {
     this.buffers.delete(id)
   }
 
-  play(id: string, volume: number): void {
-    if (id === NO_SOUND || !this.ctx) return
+  /**
+   * Play now, or `delayMs` from now on the audio clock. Scheduled sources
+   * fire from the audio thread, on time even while page JS is throttled.
+   * Returns a cancel function (no-op once played).
+   */
+  play(id: string, volume: number, delayMs = 0): () => void {
+    const noop = () => {}
+    if (id === NO_SOUND || !this.ctx || !this.bus) return noop
     const buffer = this.buffers.get(id)
-    if (!buffer) return
+    if (!buffer) return noop
     const src = this.ctx.createBufferSource()
     src.buffer = buffer
     const gain = this.ctx.createGain()
     gain.gain.value = Math.max(0, Math.min(1, volume))
     src.connect(gain)
-    gain.connect(this.ctx.destination)
-    src.start()
+    gain.connect(this.bus)
+    src.start(this.ctx.currentTime + Math.max(0, delayMs) / 1000)
+    return () => {
+      try {
+        src.stop()
+      } catch {
+        // Already stopped.
+      }
+      src.disconnect()
+    }
   }
+}
+
+function saturationCurve(drive: number): Float32Array<ArrayBuffer> {
+  const n = 4096
+  const curve = new Float32Array(n)
+  for (let i = 0; i < n; i++) {
+    const x = (i / (n - 1)) * 2 - 1
+    curve[i] = Math.tanh(drive * x) / Math.tanh(drive)
+  }
+  return curve
 }
 
 export const audioManager = new AudioManager()

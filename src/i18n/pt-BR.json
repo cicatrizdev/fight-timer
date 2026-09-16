@@ -33,6 +33,7 @@
       "interval": "Troca forte/leve"
     },
     "soundNames": {
+      "bellTriple": "Sino de boxe (3 toques)",
       "bell": "Sino de boxe A",
       "bellB": "Sino de boxe B",
       "bellEnd": "Sino final (C)",
@@ -61,6 +62,8 @@
     "ttsVoice": "Voz",
     "ttsVoiceAuto": "Automática (melhor disponível)",
     "vibrate": "Vibração",
+    "loudBoost": "Som reforçado (música alta)",
+    "loudBoostHint": "Deixa os avisos bem mais altos e encorpados para passar por cima da música. Não passa do volume máximo do celular — deixe o volume de mídia alto.",
     "silentSwitch": "Som no modo silencioso",
     "silentSwitchHint": "Ligado: os avisos tocam mesmo com o iPhone no silencioso, mas podem pausar sua música. Desligado: misturam com a música, mas o botão de silencioso é respeitado. O iOS não permite os dois ao mesmo tempo.",
     "uploadSound": "Adicionar meu som",

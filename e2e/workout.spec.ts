@@ -17,7 +17,7 @@ const CONFIG = {
     ],
     userPresets: [],
   },
-  version: 4,
+  version: 5,
 }
 
 async function openWithConfig(page: Page) {

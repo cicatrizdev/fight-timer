@@ -33,6 +33,7 @@
       "interval": "Hard/easy switch"
     },
     "soundNames": {
+      "bellTriple": "Boxing bell (3 strikes)",
       "bell": "Boxing bell A",
       "bellB": "Boxing bell B",
       "bellEnd": "Final bell (C)",
@@ -61,6 +62,8 @@
     "ttsVoice": "Voice",
     "ttsVoiceAuto": "Automatic (best available)",
     "vibrate": "Vibration",
+    "loudBoost": "Boosted sound (loud music)",
+    "loudBoostHint": "Makes cues much louder and punchier so they cut through music. It can't go past your phone's max volume — keep media volume up.",
     "silentSwitch": "Sound in silent mode",
     "silentSwitchHint": "On: cues play even with the iPhone muted, but may pause your music. Off: they mix with music, but the silent switch is respected. iOS doesn't allow both at once.",
     "uploadSound": "Add my sound",

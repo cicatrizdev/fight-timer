@@ -169,3 +169,31 @@ export function tick(
 
   return { state: { ...s, remainingMs }, events }
 }
+
+export interface ForecastEvent {
+  /** Epoch-ms of the simulated tick that emitted the event (≤ stepMs late). */
+  at: number
+  event: EngineEvent
+}
+
+/**
+ * Simulate ticks every `stepMs` over (from, until] to predict upcoming events,
+ * so cues can be scheduled ahead of time. Returns the simulated state at
+ * `until` so the forecast can be continued later.
+ */
+export function forecast(
+  state: EngineState,
+  settings: TimerSettings,
+  from: number,
+  until: number,
+  stepMs: number,
+): { events: ForecastEvent[]; state: EngineState } {
+  const events: ForecastEvent[] = []
+  let s = state
+  for (let at = from + stepMs; at <= until && s.status === 'running'; at += stepMs) {
+    const result = tick(s, settings, at)
+    s = result.state
+    for (const event of result.events) events.push({ at, event })
+  }
+  return { events, state: s }
+}

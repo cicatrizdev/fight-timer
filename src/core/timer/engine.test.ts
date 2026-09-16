@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { buildSegments, createIdleState, pause, resume, skip, start, tick, totalWorkoutSec } from './engine'
-import type { TimerSettings } from './types'
+import { buildSegments, createIdleState, forecast, pause, resume, skip, start, tick, totalWorkoutSec } from './engine'
+import type { EngineEvent, TimerSettings } from './types'
 
 const base: TimerSettings = {
   warmupSec: 10,
@@ -206,6 +206,42 @@ describe('intra-round cycles', () => {
     const { state } = start(base, 0)
     const { events } = tick(state, base, 40_000)
     expect(events.find((e) => e.type === 'cycleSwitch')).toBeUndefined()
+  })
+})
+
+describe('forecast', () => {
+  const describeEvent = (e: EngineEvent) =>
+    e.type === 'phaseStart' ? `phaseStart:${e.segment.kind}${e.segment.round}`
+      : e.type === 'countdown' ? `countdown:${e.secondsLeft}`
+        : e.type === 'cycleSwitch' ? `cycle:${e.mode}`
+          : e.type === 'warning' ? `warning:${e.segment.kind}`
+            : e.type
+
+  it('predicts the same events live ticks would emit, at step granularity', () => {
+    const { state } = start(base, 0)
+    const { events } = forecast(state, base, 0, 200_000, 25)
+    expect(events.map((f) => `${describeEvent(f.event)}@${f.at / 1000}`)).toEqual([
+      'countdown:3@7', 'countdown:2@8', 'countdown:1@9', 'phaseStart:round1@10',
+      'warning:round@60', 'countdown:3@67', 'countdown:2@68', 'countdown:1@69', 'phaseStart:rest1@70',
+      'warning:rest@95', 'countdown:3@97', 'countdown:2@98', 'countdown:1@99', 'phaseStart:round2@100',
+      'warning:round@150', 'countdown:3@157', 'countdown:2@158', 'countdown:1@159', 'phaseStart:rest2@160',
+      'warning:rest@185', 'countdown:3@187', 'countdown:2@188', 'countdown:1@189', 'phaseStart:round3@190',
+    ])
+  })
+
+  it('can be continued from the returned state without gaps or repeats', () => {
+    const { state } = start(base, 0)
+    const whole = forecast(state, base, 0, 300_000, 25).events
+    const first = forecast(state, base, 0, 65_000, 25)
+    const rest = forecast(first.state, base, 65_000, 300_000, 25).events
+    expect([...first.events, ...rest]).toEqual(whole)
+    expect(whole.at(-1)).toEqual({ at: 250_000, event: { type: 'finished' } })
+  })
+
+  it('stops at the end of the workout', () => {
+    const { state } = start(base, 0)
+    const { state: end } = forecast(state, base, 0, 10_000_000, 25)
+    expect(end.status).toBe('finished')
   })
 })
 

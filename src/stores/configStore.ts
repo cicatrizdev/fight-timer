@@ -61,8 +61,8 @@ export function makeBlock(patch: Partial<BlockConfig> = {}): BlockConfig {
 }
 
 export const DEFAULT_CUE_SOUNDS: CueSounds = {
-  roundStart: { id: 'bell', volume: 1 },
-  roundEnd: { id: 'bell', volume: 1 },
+  roundStart: { id: 'bell-triple', volume: 1 },
+  roundEnd: { id: 'bell-triple', volume: 1 },
   roundWarn: { id: 'clacker', volume: 1 },
   restWarn: { id: 'beep', volume: 0.9 },
   finish: { id: 'bell-end', volume: 1 },
@@ -106,6 +106,8 @@ export interface ConfigState extends TimingConfig {
   vibrate: boolean
   /** iOS: play cues even with the ring/silent switch on (may pause music). */
   ignoreSilentSwitch: boolean
+  /** Compress and push cues louder to cut through loud music. */
+  loudBoost: boolean
   sounds: CueSounds
   userPresets: UserPreset[]
   set: (patch: Partial<ConfigState>) => void
@@ -153,6 +155,7 @@ export const useConfigStore = create<ConfigState>()(
       ttsVoice: null,
       vibrate: true,
       ignoreSilentSwitch: false,
+      loudBoost: false,
       sounds: DEFAULT_CUE_SOUNDS,
       userPresets: [],
       set: (patch) => set(patch),
@@ -177,10 +180,11 @@ export const useConfigStore = create<ConfigState>()(
     }),
     {
       name: 'fight-timer-config',
-      version: 4,
+      version: 5,
       // v2: rest-end warning and countdown beeps became opt-in.
       // v3: voice announcements became opt-in, with a selectable voice.
       // v4: flat rounds/roundSec/restSec became a list of blocks; interval cue added.
+      // v5: round start/end moved from the single-strike bell to the triple bell.
       migrate: (persisted, version) => {
         const state = persisted as Partial<ConfigState> &
           LegacyTiming & { userPresets?: (UserPreset & Partial<Record<keyof LegacyTiming, number>>)[] }
@@ -199,6 +203,10 @@ export const useConfigStore = create<ConfigState>()(
             blocks: legacyToBlocks(p as unknown as LegacyTiming),
           }))
           state.sounds = { ...DEFAULT_CUE_SOUNDS, ...state.sounds, interval: DEFAULT_CUE_SOUNDS.interval }
+        }
+        if (version < 5 && state.sounds) {
+          const triple = (c: SoundChoice) => (c.id === 'bell' ? { ...c, id: 'bell-triple' } : c)
+          state.sounds = { ...state.sounds, roundStart: triple(state.sounds.roundStart), roundEnd: triple(state.sounds.roundEnd) }
         }
         return state as ConfigState
       },

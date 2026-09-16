@@ -172,6 +172,12 @@ export function SettingsScreen() {
         <Toggle label={t('settings.tts')} checked={config.tts} onChange={(v) => config.set({ tts: v })} />
         {config.tts && <VoicePicker />}
         <Toggle label={t('settings.vibrate')} checked={config.vibrate} onChange={(v) => config.set({ vibrate: v })} />
+        <Toggle
+          label={t('settings.loudBoost')}
+          checked={config.loudBoost}
+          onChange={(v) => config.set({ loudBoost: v })}
+        />
+        <p className="settings__hint">{t('settings.loudBoostHint')}</p>
         {isIOS() && (
           <>
             <Toggle

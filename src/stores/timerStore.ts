@@ -5,6 +5,7 @@ import { useConfigStore, type ConfigState } from './configStore'
 import { handleEngineEvents } from '../features/timer/cues'
 import { keepScreenOn, releaseScreen } from '../lib/wakeLock'
 import { audioManager } from '../core/audio/AudioManager'
+import * as cueScheduler from '../features/timer/cueScheduler'
 
 export function toTimerSettings(c: Pick<ConfigState, 'warmupSec' | 'roundWarnSec' | 'restWarnSec' | 'countdownBeeps' | 'blocks'>): TimerSettings {
   return {
@@ -92,8 +93,8 @@ function setWorkerRunning(running: boolean) {
   }
 }
 
-function afterEvents(state: EngineState, events: EngineEvent[]) {
-  if (events.length > 0) handleEngineEvents(events, state)
+function afterEvents(state: EngineState, events: EngineEvent[], playSounds = true) {
+  if (events.length > 0) handleEngineEvents(events, state, playSounds)
   if (state.status === 'finished') {
     setWorkerRunning(false)
     releaseScreen()
@@ -113,10 +114,11 @@ export const useTimerStore = create<TimerStore>()((set, get) => ({
     setWorkerRunning(true)
     keepScreenOn()
     afterEvents(state, events)
+    cueScheduler.resync(state, settings, Date.now())
   },
 
   togglePause: () => {
-    const { engine } = get()
+    const { engine, settings } = get()
     const now = Date.now()
     if (engine.status === 'running') {
       set({ engine: pause(engine, now) })
@@ -127,31 +129,41 @@ export const useTimerStore = create<TimerStore>()((set, get) => ({
       setWorkerRunning(true)
       keepScreenOn()
     }
+    cueScheduler.resync(get().engine, settings, now)
   },
 
   reset: () => {
     setWorkerRunning(false)
     releaseScreen()
-    set({ engine: createIdleState(settingsFromConfig()) })
+    const engine = createIdleState(settingsFromConfig())
+    set({ engine })
+    cueScheduler.resync(engine, get().settings, Date.now())
   },
 
   skipPhase: () => {
-    const { engine } = get()
-    const { state, events } = skip(engine, Date.now())
+    const { engine, settings } = get()
+    const now = Date.now()
+    const { state, events } = skip(engine, now)
     set({ engine: state })
     afterEvents(state, events)
+    cueScheduler.resync(state, settings, now)
   },
 
   addThirtySeconds: () => {
     set((s) => ({ engine: extend(s.engine, 30_000) }))
+    const { engine, settings } = get()
+    cueScheduler.resync(engine, settings, Date.now())
   },
 
   _tick: () => {
     const { engine, settings } = get()
     if (engine.status !== 'running') return
-    const { state, events } = tick(engine, settings, Date.now())
+    const now = Date.now()
+    const { state, events } = tick(engine, settings, now)
+    const queued = cueScheduler.coversUntil(now)
     set({ engine: state })
-    afterEvents(state, events)
+    afterEvents(state, events, !queued)
+    cueScheduler.sync(state, settings, now)
   },
 }))
 
@@ -172,6 +184,15 @@ useTimerStore.subscribe((s, prev) => {
     clearActive()
   }
 })
+
+// Queued sounds captured the old sound choices / boost; requeue with the new.
+useConfigStore.subscribe((c, prev) => {
+  if (c.sounds === prev.sounds && c.loudBoost === prev.loudBoost) return
+  audioManager.setBoost(c.loudBoost)
+  const { engine, settings } = useTimerStore.getState()
+  cueScheduler.resync(engine, settings, Date.now())
+})
+audioManager.setBoost(useConfigStore.getState().loudBoost)
 
 // Finish restoring a workout that was live when the page was closed: catch the
 // engine up silently (no missed-cue barrage) and re-arm worker + wake lock.

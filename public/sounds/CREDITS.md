@@ -5,6 +5,7 @@ hand-picked by the user, trimmed and loudness-normalized (-14 LUFS).
 
 | File | Source | Notes |
 | --- | --- | --- |
+| `bell-triple.mp3` | [Boxing Bell Signals (fs:520998)](https://freesound.org/s/520998/) by Mateusz_Chenc | Signal A struck ×3, 0.35s apart (round start/end) |
 | `bell.mp3` | [Boxing Bell Signals (fs:520998)](https://freesound.org/s/520998/) by Mateusz_Chenc | Signal A (0–2.1s) |
 | `bell-b.mp3` | [Boxing Bell Signals (fs:520998)](https://freesound.org/s/520998/) by Mateusz_Chenc | Signal B (9.3–11.6s) |
 | `bell-end.mp3` | [Boxing Bell Signals (fs:520998)](https://freesound.org/s/520998/) by Mateusz_Chenc | Signal C (17.8–20.3s) |

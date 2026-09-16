@@ -9,6 +9,7 @@ export interface PresetSound {
 }
 
 export const PRESET_SOUNDS: PresetSound[] = [
+  { id: 'bell-triple', url: '/sounds/bell-triple.mp3', nameKey: 'bellTriple' },
   { id: 'bell', url: '/sounds/bell.mp3', nameKey: 'bell' },
   { id: 'bell-b', url: '/sounds/bell-b.mp3', nameKey: 'bellB' },
   { id: 'bell-end', url: '/sounds/bell-end.mp3', nameKey: 'bellEnd' },
